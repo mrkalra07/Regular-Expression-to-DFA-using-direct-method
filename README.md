@@ -15,10 +15,3 @@ This project is a C++ program that parses regular expressions and constructs a D
 ### Prerequisites
 
 - C++ compiler (e.g., `g++`)
-
-### Compilation
-
-To compile the code, use the following command:
-
-```bash
-g++ -o Regular-Expression-to-DFA-using-direct-method RE_to_DFA.cpp
