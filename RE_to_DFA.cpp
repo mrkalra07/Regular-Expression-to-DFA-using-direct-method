@@ -171,9 +171,9 @@ int main() {
     for (auto& entry : positions) {
         int pos = entry.first;
         char symbol = entry.second;
-        cout << symbol << "\t{";
-        cout << pos << "}\t\t";
-        cout << "{" << pos << "}\t\t";
+        cout << symbol << "\t\t{";
+        cout << pos << "}\t\t\t";
+        cout << "{" << pos << "}\t\t\t";
 
         if (followpos.find(pos) != followpos.end()) {
             printSet(followpos[pos]);
@@ -191,11 +191,11 @@ int main() {
 
         if (!node) continue;
         if (node->symbol == '|' || node->symbol == '.' || node->symbol == '*') {
-            cout << node->symbol << "\t";
+            cout << node->symbol << "\t\t";
             printSet(node->firstpos);
-            cout << "\t";
+            cout << "\t\t";
             printSet(node->lastpos);
-            cout << "\t-\n";
+            cout << "\t\t\t-\n";
         }
 
         nodes.push(node->right);
