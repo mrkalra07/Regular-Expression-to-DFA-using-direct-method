@@ -144,6 +144,55 @@ void printSet(const set<int>& s) {
     cout << "}";
 }
 
+void createDFA(map<int,char> positions, map<int, set<int>> followpos, set<int> start){
+    set<char> inputs;
+    int finalPos=-1;
+
+    for (const auto& pos : positions){
+        if (pos.second == '#'){
+            finalPos = pos.first;
+        } else{
+            inputs.insert(pos.second);
+        }
+    }
+    
+    set<int> finalStates;
+    map<set<int>,int> states;
+    queue<set<int>> newStates;
+
+    newStates.push(start);
+    states[start] = 0;
+    cout << "Start State: Q0\n\nTransitions:\n";
+
+    int index = 1;
+    while(!newStates.empty()){
+        set<int> s=newStates.front(); newStates.pop();
+        
+        if (s.count(finalPos)){
+            finalStates.insert(states[s]);
+        }
+        for (char c: inputs){
+            set<int> nextState;
+
+            for (int pos: s){
+                if (positions[pos] == c){
+                    nextState.insert(followpos[pos].begin(), followpos[pos].end());
+                }
+            }
+            if (!nextState.empty()){
+                if (!states.count(nextState)){
+                    newStates.push(nextState);
+                    states[nextState] = index++;
+                }
+                cout << " \t • Q" << states[s] << " --" << c << "--> " << "Q" << states[nextState] << endl;
+            }
+        }
+    }
+    cout << "\nFinal State(s): ";
+    for (int i: finalStates){
+        cout << "Q" << i << " ";
+    }
+}
 int main() {
     string regex;
     cout << "Enter regular expression: ";
@@ -157,23 +206,25 @@ int main() {
             modifiedRegex += '.';
         }
     }
+    modifiedRegex += '.';
+    modifiedRegex += '#';
 
     string postfix = infixToPostfix(modifiedRegex);
 
     map<int, char> positions;
     Node* root = buildSyntaxTree(postfix, positions);
 
-
     map<int, set<int>> followpos;
     computeFollowpos(root, followpos);
 
-    cout << "Symbols\tfirstpos(n)\tlastpos(n)\tfollowpos(i)" << endl;
+    cout << "i \tSymbols \tfirstpos(n)\tlastpos(n)\tfollowpos(i)" << endl;
     for (auto& entry : positions) {
         int pos = entry.first;
         char symbol = entry.second;
+        cout << pos <<"\t";
         cout << symbol << "\t\t{";
-        cout << pos << "}\t\t\t";
-        cout << "{" << pos << "}\t\t\t";
+        cout << pos << "}\t\t";
+        cout << "{" << pos << "}\t\t";
 
         if (followpos.find(pos) != followpos.end()) {
             printSet(followpos[pos]);
@@ -191,16 +242,16 @@ int main() {
 
         if (!node) continue;
         if (node->symbol == '|' || node->symbol == '.' || node->symbol == '*') {
-            cout << node->symbol << "\t\t";
+            cout << "-\t" << node->symbol << "\t\t";
             printSet(node->firstpos);
             cout << "\t\t";
             printSet(node->lastpos);
-            cout << "\t\t\t-\n";
+            cout << "\t\t-\n";
         }
-
         nodes.push(node->right);
         nodes.push(node->left);
     }
 
+    createDFA(positions, followpos, root->firstpos);
     return 0;
 }
